@@ -1,0 +1,65 @@
+graph TB
+    Start([START]) --> Init[Initialize AgentState<br/>- target_bank<br/>- sample_pdf_path<br/>- sample_csv_path<br/>- attempt_count: 0<br/>- is_success: false]
+    
+    Init --> Planning[<b>PLANNING NODE</b><br/>Gemini 2.5 Pro Analysis]
+    
+    Planning --> PlanningTasks[<b>Planning Tasks:</b><br/>• Extract PDF content via pdfplumber<br/>• Load expected CSV schema<br/>• Analyze transaction patterns<br/>• Identify date formats DD-MM-YYYY<br/>• Detect amount classifications<br/>• Map PDF columns to CSV structure<br/>• Formulate parsing strategy]
+    
+    PlanningTasks --> PlanningError{Planning<br/>Success?}
+    PlanningError -->|No| ErrorFeedback1[Set error_feedback:<br/>'Planning failed']
+    ErrorFeedback1 --> End([END - FAILURE])
+    
+    PlanningError -->|Yes| UpdateState1[Update State:<br/>• pdf_content<br/>• expected_dataframe]
+    
+    UpdateState1 --> CodeGen[<b>CODE GENERATION NODE</b><br/>Gemini 2.5 Pro Coding]
+    
+    CodeGen --> CodeGenTasks[<b>Code Generation Tasks:</b><br/>• Generate Python parser code<br/>• Include all imports<br/>• Implement parse pdf_path → DataFrame<br/>• Add error handling try-except<br/>• Apply type hints<br/>• Write comprehensive docs<br/>• Parse dates in DD-MM-YYYY<br/>• Handle debit/credit amounts<br/>• Clean markdown formatting<br/>• Incorporate error_feedback if exists]
+    
+    CodeGenTasks --> CodeGenError{Code Gen<br/>Success?}
+    CodeGenError -->|No| ErrorFeedback2[Set error_feedback:<br/>'Code generation error']
+    ErrorFeedback2 --> IncrementAttempt1[Increment attempt_count]
+    IncrementAttempt1 --> CheckAttempts1{attempt_count<br/>>= max_attempts?}
+    CheckAttempts1 -->|Yes| End
+    CheckAttempts1 -->|No| Reflection
+    
+    CodeGenError -->|Yes| UpdateState2[Update State:<br/>• generated_code<br/>• increment attempt_count]
+    
+    UpdateState2 --> Testing[<b>TESTING NODE</b><br/>Comprehensive Validation]
+    
+    Testing --> TestingTasks[<b>Testing Tasks:</b><br/>• Write parser to output file<br/>• Validate function signature<br/>• Check 'def parse' exists<br/>• Verify 'pd.DataFrame' return<br/>• Validate import statements<br/>• Check DataFrame structure<br/>• Compare column alignment<br/>• Execute on sample data<br/>• Generate detailed feedback]
+    
+    TestingTasks --> TestResult{Test<br/>Passed?}
+    
+    TestResult -->|Yes| UpdateSuccess[Set is_success: true<br/>Set test_results: success]
+    UpdateSuccess --> Success([END - SUCCESS<br/><b>Parser Generated!</b><br/>Output: custom_parsers/bank_parser.py])
+    
+    TestResult -->|No| UpdateFailure[Set is_success: false<br/>Set error_feedback with details]
+    UpdateFailure --> DecisionPoint{Decision<br/>Router}
+    
+    DecisionPoint -->|attempt_count >= max_attempts| Fail([END - FAILURE<br/>Max attempts reached<br/>Review error logs])
+    
+    DecisionPoint -->|attempt_count < max_attempts| Reflection[<b>REFLECTION NODE</b><br/>Gemini 2.5 Pro Reasoning]
+    
+    Reflection --> ReflectionTasks[<b>Reflection Tasks:</b><br/>• Perform root cause analysis<br/>• Analyze failure patterns<br/>• Identify missing imports<br/>• Detect logical errors<br/>• Examine parsing strategy<br/>• Generate specific guidance<br/>• Create actionable feedback<br/>• Suggest code modifications]
+    
+    ReflectionTasks --> ReflectionError{Reflection<br/>Success?}
+    ReflectionError -->|No| ErrorFeedback3[Append reflection error<br/>to error_feedback]
+    ErrorFeedback3 --> CodeGen
+    
+    ReflectionError -->|Yes| UpdateFeedback[Update error_feedback with<br/>reflection insights]
+    UpdateFeedback --> CodeGen
+    
+    style Start fill:#e1f5e1
+    style Success fill:#c8e6c9
+    style End fill:#ffcdd2
+    style Fail fill:#ffcdd2
+    style Planning fill:#bbdefb
+    style CodeGen fill:#bbdefb
+    style Testing fill:#bbdefb
+    style Reflection fill:#bbdefb
+    style DecisionPoint fill:#fff9c4
+    style TestResult fill:#fff9c4
+    style PlanningError fill:#fff9c4
+    style CodeGenError fill:#fff9c4
+    style ReflectionError fill:#fff9c4
+    style CheckAttempts1 fill:#fff9c4
