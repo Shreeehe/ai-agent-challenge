@@ -1,8 +1,8 @@
 # Karbon AI Challenge - "Agent-as-Coder" Solution
 
-> 🤖 Autonomous AI agent that generates custom bank statement PDF parsers using Gemini 2.5 Pro and LangGraph
+> Autonomous AI agent that generates custom bank statement PDF parsers using Gemini 2.5 Pro and LangGraph
 
-## 🚀 5-Step Run Instructions
+## 5-Step Run Instructions
 
 ### Step 1: Install Dependencies
 ```bash
