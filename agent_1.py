@@ -1,12 +1,3 @@
-#!/usr/bin/env python3
-"""
-Karbon AI Challenge - Agent as Coder
-====================================
-
-This agent dynamically generates custom bank statement parsers using LangGraph.
-Updated for Gemini 2.5 Pro (gemini-2.0-flash-exp).
-"""
-
 import argparse
 import logging
 import os
@@ -27,8 +18,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Hardcoded API key for easier setup
-GEMINI_API_KEY = "AIzaSyD9f3e1TWsNDo8Cd9sWZzLv1H_QYeM0OsE"
+# Insert API Key(USE GEMINI)
+GEMINI_API_KEY = "YOUR_KEY_PLEASE"
 
 
 class AgentState(TypedDict):
@@ -404,4 +395,5 @@ def main():
 
 if __name__ == "__main__":
     success = main()
+
     sys.exit(0 if success else 1)
