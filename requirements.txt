@@ -1,0 +1,8 @@
+# Karbon AI Challenge Requirements
+langgraph>=0.2.0
+google-generativeai>=0.8.0
+pandas>=2.0.0
+pdfplumber>=0.11.0
+PyPDF2>=3.0.0
+pathlib
+typing-extensions
