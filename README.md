@@ -2,7 +2,7 @@
 
 ### Step 1: Install UV
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+pip install uv
 ```
 
 ### Step 2: Clone Repository and Setup Environment
