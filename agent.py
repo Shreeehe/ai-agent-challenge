@@ -18,8 +18,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Insert API Key(USE GEMINI)
-GEMINI_API_KEY = "YOUR_KEY_PLEASE"
+# API Key included.
+GEMINI_API_KEY = "AIzaSyD9f3e1TWsNDo8Cd9sWZzLv1H_QYeM0OsE"
 
 
 class AgentState(TypedDict):
@@ -397,3 +397,4 @@ if __name__ == "__main__":
     success = main()
 
     sys.exit(0 if success else 1)
+
