@@ -5,13 +5,12 @@
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-### Step 2: Clone Repository
+### Step 2: Clone Repository and Setup Environment
 ```bash
 git clone https://github.com/Shreeehe/ai-agent-challenge.git
 cd ai-agent-challenge
 ```
-
-### Step 3: Setup Environment
+&
 ```bash
 # Create virtual environment and install dependencies
 uv venv
@@ -19,7 +18,8 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 uv pip install langgraph google-generativeai pandas pdfplumber PyPDF2 pytest
 ```
 
-### Step 4: Prepare Sample Data
+
+### Step 3: Prepare Sample Data
 Place your sample files in the data directory:
 ```
 data/icici/
@@ -27,11 +27,29 @@ data/icici/
 └── icici_sample.csv    # Expected output format CSV
 ```
 
-Note: API key is already configured in `agent.py`
+(API key is already configured in `agent.py`)
 
-### Step 5: Run the Agent
+### Step 4: Run the Agent
 ```bash
 python agent.py --target icici
+```
+
+### Step 5: Use Generated Parser
+```python
+# Test the parser directly
+python -c "
+from custom_parsers.icici_parser import parse
+import pandas as pd
+
+# Parse the PDF
+result = parse('data/icici/icici_sample.pdf')
+print('Generated parser output:')
+print(result.head())
+
+# Save as CSV
+result.to_csv('parsed_output.csv', index=False)
+print('Saved to parsed_output.csv')
+"
 ```
 
 ## Agent Architecture Diagram
