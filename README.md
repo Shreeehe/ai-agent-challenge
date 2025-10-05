@@ -29,9 +29,20 @@ python agent.py --target icici
 
 ### Step 5: Use Generated Parser
 ```python
+# Test the parser directly
+python -c "
 from custom_parsers.icici_parser import parse
-df = parse('data/icici/icici_sample.pdf')
-print(df.head())
+import pandas as pd
+
+# Parse the PDF
+result = parse('data/icici/icici_sample.pdf')
+print('Generated parser output:')
+print(result.head())
+
+# Save as CSV
+result.to_csv('parsed_output.csv', index=False)
+print('Saved to parsed_output.csv')
+"
 ```
 
 ## 🔄 Agent Architecture Diagram
