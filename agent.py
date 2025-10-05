@@ -18,7 +18,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# API Key included.
+# Hardcoded API key for easier setup
 GEMINI_API_KEY = "AIzaSyD9f3e1TWsNDo8Cd9sWZzLv1H_QYeM0OsE"
 
 
@@ -143,17 +143,42 @@ class KarbonAgent:
         - Return DataFrame matching expected CSV structure exactly
         - Handle errors gracefully with try-except blocks
         - Include proper imports at the top
-        - Parse dates in DD-MM-YYYY format
-        - Handle both debit and credit amounts
-        - Return clean DataFrame with proper column names
-
-        Expected DataFrame columns: {list(state['expected_dataframe'].columns)}
-        Sample data format from PDF:
-        {state['pdf_content'][:1000]}
+        
+        CRITICAL PARSING LOGIC (FOLLOW EXACTLY):
+        
+        Each transaction line in the PDF has this structure:
+        DATE DESCRIPTION [DEBIT_AMOUNT] [CREDIT_AMOUNT] BALANCE
+        
+        Where:
+        - DATE: Always DD-MM-YYYY at the start (use regex: r'\\d{{2}}-\\d{{2}}-\\d{{4}}')
+        - DESCRIPTION: Text between date and numeric amounts
+        - DEBIT_AMOUNT: Optional number (if transaction is a debit)
+        - CREDIT_AMOUNT: Optional number (if transaction is a credit)
+        - BALANCE: Always the LAST number on the line
+        
+        IMPORTANT: Either Debit OR Credit will have a value, NOT BOTH. One will always be empty/None.
+        
+        Parsing Strategy:
+        1. Use regex to find date at start: r'^(\\d{{2}}-\\d{{2}}-\\d{{4}})'
+        2. Extract ALL numbers with decimals from the line: r'\\d+\\.\\d+'
+        3. The LAST number is always Balance
+        4. If there are 2 numbers total: [amount, balance] - determine if amount is debit or credit from context
+        5. If there are 3 numbers total: [debit, credit, balance] - middle number positioning helps identify which is which
+        6. Description is everything BETWEEN the date and the first number
+        
+        Expected output format (columns in this EXACT order):
+        {list(state['expected_dataframe'].columns)}
+        
+        Here's the actual expected output to match (first 5 rows):
+        {state['expected_dataframe'].head(5).to_string()}
+        
+        PDF content sample:
+        {state['pdf_content'][:1500]}
 
         {"Previous error feedback: " + feedback if feedback else ""}
 
-        Generate ONLY the complete Python code with all imports, no explanations:
+        Generate ONLY the complete Python code with all imports, no explanations.
+        Use regex patterns. Test your logic carefully to ensure amounts go in correct columns.
         """
 
         try:
@@ -307,9 +332,15 @@ class KarbonAgent:
         custom_parser_dir = Path("custom_parsers")
         custom_parser_dir.mkdir(exist_ok=True)
 
-        # Validate input files
+        # Validate input files - try both naming conventions
         pdf_file = data_dir / f"{target_bank}_sample.pdf"
         csv_file = data_dir / f"{target_bank}_sample.csv"
+        
+        # If prefixed files don't exist, try without prefix
+        if not pdf_file.exists():
+            pdf_file = data_dir / "sample.pdf"
+        if not csv_file.exists():
+            csv_file = data_dir / "sample.csv"
 
         logger.info("Looking for input files:")
         logger.info(f"  PDF: {pdf_file}")
@@ -319,9 +350,9 @@ class KarbonAgent:
             logger.error("Required files not found")
             logger.error(f"  Expected PDF: {pdf_file}")
             logger.error(f"  Expected CSV: {csv_file}")
-            logger.info("Please ensure the following files exist:")
-            logger.info(f"  1. data/{target_bank}/{target_bank}_sample.pdf")
-            logger.info(f"  2. data/{target_bank}/{target_bank}_sample.csv")
+            logger.info("Please ensure files exist in one of these formats:")
+            logger.info(f"  Format 1: data/{target_bank}/{target_bank}_sample.pdf and {target_bank}_sample.csv")
+            logger.info(f"  Format 2: data/{target_bank}/sample.pdf and sample.csv")
             return False
 
         logger.info("Input files validated successfully")
@@ -395,6 +426,4 @@ def main():
 
 if __name__ == "__main__":
     success = main()
-
     sys.exit(0 if success else 1)
-
