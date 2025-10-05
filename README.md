@@ -14,7 +14,7 @@ cd ai-agent-challenge
 ```bash
 # Create virtual environment and install dependencies
 uv venv
-venv\Scripts\activate
+.venv\Scripts\activate
 uv pip install langgraph google-generativeai pandas pdfplumber PyPDF2 pytest
 ```
 
