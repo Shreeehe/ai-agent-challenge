@@ -1,6 +1,6 @@
 ## 5-Step Run Instructions
 
-### Step 1: Install UV
+### Step 1: Install UV (I Prefer UV, btw)
 ```bash
 pip install uv
 ```
